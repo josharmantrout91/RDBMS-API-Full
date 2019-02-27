@@ -9,16 +9,44 @@ const db = knex(knexConfig.development);
 // ********* CREATE METHODS ********* //
 
 // POST a new cohort
-// router.post("/cohorts", (req, res) => {
-//     db("cohorts")
-//     .insert()
-//     .then(ids => {
-//         const [id] = ids;
+router.post("/cohorts", (req, res) => {
+  const newCohort = req.body;
+  db("cohorts")
+    .insert(newCohort)
+    .then(ids => {
+      const [id] = ids;
 
-//         db("cohorts")
-//         .where({id})
-//     })
-// })
+      db("cohorts")
+        .where({ id })
+        .first()
+        .then(createdCohort => {
+          res.status(201).json(createdCohort);
+        });
+    })
+    .catch(error => {
+      res.status(500).json({ message: "Unable to create new cohort" });
+    });
+});
+
+// POST a new student
+router.post("/students", (req, res) => {
+  const newStudent = req.body;
+  db("students")
+    .insert(newStudent)
+    .then(ids => {
+      const [id] = ids;
+
+      db("students")
+        .where({ id })
+        .first()
+        .then(createdStudent => {
+          res.status(201).json(createdStudent);
+        });
+    })
+    .catch(error => {
+      res.status(500).json({ message: "Unable to create new student" });
+    });
+});
 
 // ********* READ METHODS ********* //
 
