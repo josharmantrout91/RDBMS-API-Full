@@ -98,4 +98,34 @@ router.get("/students/:id", (req, res) => {
     });
 });
 
+// ********* UPDATE METHODS ********* //
+
+// UPDATE an existing cohort
+router.put("/cohorts/:id", (req, res) => {
+  cohortUpdates = req.body;
+  db("cohorts")
+    .where({ id: req.params.id })
+    .update(cohortUpdates)
+    .then(count => {
+      if (count > 0) {
+        db("cohorts")
+          .where({ id: req.params.id })
+          .first()
+          .then(updatedCohort => {
+            res.status(200).json(updatedCohort);
+          });
+      } else {
+        res.status(404).json({ message: "cohort not found" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
+// UPDATE an existing student
+
+// ********* DELETE METHODS ********* //
+
+// DELETE an existing cohort
+
 module.exports = router;
