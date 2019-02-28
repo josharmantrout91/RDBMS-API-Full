@@ -88,9 +88,9 @@ router.get("/students", (req, res) => {
 
 // // GET a single student by id, replace cohort id with cohort name so that the ORM translates into the following SQL:
 
-select students.name, cohorts.name as cohort,
-from cohorts
-inner join students on students.cohort_id = cohorts.Id
+// select students.name, cohorts.name as cohort,
+// from cohorts
+// inner join students on students.cohort_id = cohorts.Id
 
 router.get("/students/:id", (req, res) => {
   db("cohorts")
