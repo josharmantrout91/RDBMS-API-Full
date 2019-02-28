@@ -86,10 +86,18 @@ router.get("/students", (req, res) => {
     });
 });
 
-// GET a single student by id
+// // GET a single student by id, replace cohort id with cohort name so that the ORM translates into the following SQL:
+
+select students.name, cohorts.name as cohort,
+from cohorts
+inner join students on students.cohort_id = cohorts.Id
+
 router.get("/students/:id", (req, res) => {
-  db("students")
-    .where({ id: req.params.id })
+  db("cohorts")
+    .select("students.id", "students.name", "cohorts.name as cohort")
+    .join("students", "students.cohort_id", "cohorts.id")
+    .where({ "students.id": req.params.id })
+    .first()
     .then(student => {
       res.status(200).json(student);
     })
@@ -122,7 +130,29 @@ router.put("/cohorts/:id", (req, res) => {
       res.status(500).json(error);
     });
 });
+
 // UPDATE an existing student
+router.put("/students/:id", (req, res) => {
+  studentUpdates = req.body;
+  db("students")
+    .where({ id: req.params.id })
+    .update(studentUpdates)
+    .then(count => {
+      if (count > 0) {
+        db("students")
+          .where({ id: req.params.id })
+          .first()
+          .then(updatedStudent => {
+            res.status(200).json(updatedStudent);
+          });
+      } else {
+        res.status(404).json({ message: "student not found" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
 
 // ********* DELETE METHODS ********* //
 
@@ -140,6 +170,23 @@ router.delete("/cohorts/:id", (req, res) => {
     })
     .catch(error => {
       res.status(500).json({ error: "unable to delete cohort" });
+    });
+});
+
+// DELETE an existing student
+router.delete("/students/:id", (req, res) => {
+  db("students")
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      if (count > 0) {
+        res.status(204).json({ message: "student successfully deleted" });
+      } else {
+        res.status(404).json({ error: "student not found" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({ error: "unable to delete error" });
     });
 });
 
