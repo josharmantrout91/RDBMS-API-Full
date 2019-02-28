@@ -127,5 +127,20 @@ router.put("/cohorts/:id", (req, res) => {
 // ********* DELETE METHODS ********* //
 
 // DELETE an existing cohort
+router.delete("/cohorts/:id", (req, res) => {
+  db("cohorts")
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      if (count > 0) {
+        res.status(204).json({ message: "cohort successfully deleted" });
+      } else {
+        res.status(404).json({ error: "cohort not found" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({ error: "unable to delete cohort" });
+    });
+});
 
 module.exports = router;
